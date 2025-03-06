@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from io import BytesIO
+import openpyxl
 
 st.set_page_config(page_title="🗃Data Sweeper", layout="wide")
 st.title("📁Data Sweeper")
@@ -15,7 +16,7 @@ if uploaded_files:
         if file_ext == ".csv":
             df = pd.read_csv(file)
         elif file_ext == ".xlsx":
-            df = pd.read_excel(file, engine="openpyxl")  # Explicitly defining the Excel engine
+            df = pd.read_excel(file, engine=openpyxl)
         else:
             st.error(f"Unsupported file format: {file_ext}. Please upload a valid CSV or Excel file.")
             continue
@@ -56,7 +57,7 @@ if uploaded_files:
                 file_name = file.name.replace(file_ext, ".csv")
                 mime_type = "text/csv"
             elif conversion_type == "Excel":
-                df.to_excel(buffer, index=False, engine="openpyxl") 
+                df.to_excel(buffer, index=False, engine=openpyxl) 
                 file_name = file.name.replace(file_ext, ".xlsx")
                 mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             buffer.seek(0)
