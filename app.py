@@ -4,28 +4,28 @@ import os
 from io import BytesIO
 
 st.set_page_config(page_title="🗃Data Sweeper", layout="wide")
-st.title("📁Data sweeper")
-st.write("This app is designed to help you clean your data and transform your data files b/w CSV and Excel formats.")
+st.title("📁Data Sweeper")
+st.write("This app is designed to help you clean and transform your data files between CSV and Excel formats.")
 
-uploade_files = st.file_uploader("Upload your CSV or Excel file", type=['csv', 'xlsx'],
-                                 accept_multiple_files=True)
+uploaded_files = st.file_uploader("Upload your CSV or Excel file", type=['csv', 'xlsx'], accept_multiple_files=True)
 
-if uploade_files:
-    for file in uploade_files:
+if uploaded_files:
+    for file in uploaded_files:
         file_ext = os.path.splitext(file.name)[-1].lower()
         if file_ext == ".csv":
             df = pd.read_csv(file)
         elif file_ext == ".xlsx":
-            df = pd.read_excel(file)
+            df = pd.read_excel(file, engine="openpyxl")  # Explicitly defining the Excel engine
         else:
-            st.error(f"Please upload a valid CSV or Excel file, unsupported file format: {file_ext}")
+            st.error(f"Unsupported file format: {file_ext}. Please upload a valid CSV or Excel file.")
             continue
+        
         st.write(f"**File Name:** {file.name}")
-        st.write(f"**File Size:** {file.size/1024}")
-
+        st.write(f"**File Size:** {file.size / 1024:.2f} KB")
+        
         st.write("Dataframe Head Preview")
         st.write(df.head())
-
+        
         st.subheader("Data Cleaning Options")
         if st.checkbox(f"Clean Data for: {file.name}"):
             col1, col2 = st.columns(2)
@@ -34,37 +34,33 @@ if uploade_files:
                     df.drop_duplicates(inplace=True)
                     st.write("Duplicates removed successfully")
             with col2:
-                if st.button(f"Fill missing Values for {file.name}"):
+                if st.button(f"Fill Missing Values for {file.name}"):
                     numeric_cols = df.select_dtypes(include=['number']).columns
                     df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
                     st.write("Missing values filled successfully")
-
-        st.subheader("Select columns to convert")
-        columns = st.multiselect(f"Choose Column for {file.name}", df.columns, default=df.columns)
+        
+        st.subheader("Select Columns to Convert")
+        columns = st.multiselect(f"Choose Columns for {file.name}", df.columns, default=df.columns)
         df = df[columns]
-
-
+        
         st.subheader("Data Visualization")
         if st.checkbox(f"Show Data Visualization for {file.name}"):
             st.bar_chart(df.select_dtypes(include=['number']).iloc[:, :2])
-
         
         st.subheader("Conversion Options")
         conversion_type = st.radio(f"Convert {file.name} to:", ["CSV", "Excel"], key=file.name)
         if st.button(f"Convert {file.name}"):
             buffer = BytesIO()
             if conversion_type == "CSV":
-               df.to_csv(buffer, index=False)
-               file_name = file.name.replace(file_ext, ".csv")
-               mime_type = "text/csv"
-            
+                df.to_csv(buffer, index=False)
+                file_name = file.name.replace(file_ext, ".csv")
+                mime_type = "text/csv"
             elif conversion_type == "Excel":
-                df.to_excel(buffer, index=False)
+                df.to_excel(buffer, index=False, engine="openpyxl") 
                 file_name = file.name.replace(file_ext, ".xlsx")
                 mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             buffer.seek(0)
-
-
+            
             st.download_button(
                 label=f"⬇ Click here to download {file_name} as {conversion_type}",
                 data=buffer,
@@ -72,7 +68,4 @@ if uploade_files:
                 mime=mime_type
             )
 
-
-
 st.success("Thank you for using this app 😊")
-                
