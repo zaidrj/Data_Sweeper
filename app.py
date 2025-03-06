@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd
 import os
+import subprocess
 from io import BytesIO
 
-# Ensure openpyxl is imported for reading Excel files
-import openpyxl
+# Install openpyxl at runtime if missing (for Streamlit Cloud)
+try:
+    import openpyxl
+except ImportError:
+    subprocess.run(["pip", "install", "openpyxl"])
+    import openpyxl  # Re-import after installation
 
 # Streamlit Page Config
 st.set_page_config(page_title="🗃 Data Sweeper", layout="wide")
