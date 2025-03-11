@@ -1,7 +1,5 @@
 ## 🗃 Data Sweeper – Streamlit Web App for Data Cleaning & Conversion  
 
-![Data Sweeper Banner](https://source.unsplash.com/1600x900/?data,technology)  
-
 ### 🚀 **Overview**  
 **Data Sweeper** is a **Streamlit-based web application** that allows users to **upload, clean, visualize, and convert** CSV and Excel files. It helps streamline **data processing** by removing duplicates, filling missing values, and converting files between different formats effortlessly.  
 
